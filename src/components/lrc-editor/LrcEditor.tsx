@@ -30,11 +30,16 @@ export function LrcEditor() {
   const [showLyricsList, setShowLyricsList] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const skipLyricsParseRef = useRef(false);
   const { audioUrl, isPlaying, currentTime, duration, loadAudio, togglePlay, seek, seekRelative } = useAudioPlayer();
   const { canUndo, canRedo, pushAction, undo, redo, clear } = useUndoRedo();
 
-  // Parse lyrics text into lines
+  // Parse lyrics text into lines (skip when loading from LRC file)
   useEffect(() => {
+    if (skipLyricsParseRef.current) {
+      skipLyricsParseRef.current = false;
+      return;
+    }
     if (!lyricsText.trim()) {
       setLines([]);
       setShowLyricsList(false);
@@ -147,11 +152,15 @@ export function LrcEditor() {
       const { lines: parsedLines, metadata: parsedMetadata } = parseLrc(content);
       setMetadata(parsedMetadata);
       setLines(parsedLines);
+      setCurrentLineIndex(0);
       setShowLyricsList(true);
+      clear();
+      skipLyricsParseRef.current = true;
       setLyricsText(parsedLines.map(l => l.text).join('\n'));
     };
     reader.readAsText(file);
-  }, []);
+    if (e.target) e.target.value = '';
+  }, [clear]);
 
   const lrcContent = generateLrc(lines, metadata, offset);
 
