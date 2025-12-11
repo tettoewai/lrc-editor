@@ -56,21 +56,23 @@ export function LrcEditor() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       
-      if (e.code === 'Space' && isPlaying && lines.length > 0) {
+      if (e.code === 'Space') {
         e.preventDefault();
-        const line = lines[currentLineIndex];
-        if (line) {
-          pushAction({
-            type: 'set',
-            lineId: line.id,
-            previousTimestamp: line.timestamp,
-            newTimestamp: currentTime
-          });
-          setLines(prev => prev.map((l, i) => 
-            i === currentLineIndex ? { ...l, timestamp: currentTime } : l
-          ));
-          if (currentLineIndex < lines.length - 1) {
-            setCurrentLineIndex(prev => prev + 1);
+        if (isPlaying && lines.length > 0) {
+          const line = lines[currentLineIndex];
+          if (line) {
+            pushAction({
+              type: 'set',
+              lineId: line.id,
+              previousTimestamp: line.timestamp,
+              newTimestamp: currentTime
+            });
+            setLines(prev => prev.map((l, i) => 
+              i === currentLineIndex ? { ...l, timestamp: currentTime } : l
+            ));
+            if (currentLineIndex < lines.length - 1) {
+              setCurrentLineIndex(prev => prev + 1);
+            }
           }
         }
       }
