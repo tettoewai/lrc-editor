@@ -319,6 +319,10 @@ export function LrcEditor() {
                     onLineClick={setCurrentLineIndex}
                     onTextChange={handleTextChange}
                     onAddLine={handleAddLine}
+                    onPlayFromTimestamp={(timestamp) => {
+                      seek(timestamp);
+                      if (!isPlaying) togglePlay();
+                    }}
                   />
                 </>
               )}

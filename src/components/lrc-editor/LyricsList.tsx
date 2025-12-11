@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { X, Check, Plus, Minus } from 'lucide-react';
+import { X, Check, Plus, Minus, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ interface LyricsListProps {
   onLineClick: (index: number) => void;
   onTextChange: (lineId: string, newText: string) => void;
   onAddLine: (index: number, position: 'above' | 'below') => void;
+  onPlayFromTimestamp: (timestamp: number) => void;
 }
 
 export function LyricsList({
@@ -25,7 +26,8 @@ export function LyricsList({
   onTimestampChange,
   onLineClick,
   onTextChange,
-  onAddLine
+  onAddLine,
+  onPlayFromTimestamp
 }: LyricsListProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [editingTimestampId, setEditingTimestampId] = useState<string | null>(null);
@@ -100,7 +102,7 @@ export function LyricsList({
               <Plus className="h-2 w-2" />
             </Button>
 
-            <div className="flex-shrink-0 w-40">
+            <div className="flex-shrink-0 w-48">
               {editingTimestampId === line.id ? (
                 <div className="flex items-center gap-1">
                   <Input
@@ -166,6 +168,18 @@ export function LyricsList({
                         title="+10ms"
                       >
                         <Plus className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 opacity-50 hover:opacity-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPlayFromTimestamp(line.timestamp);
+                        }}
+                        title="Play from here"
+                      >
+                        <Play className="h-3 w-3" />
                       </Button>
                       <Button
                         variant="ghost"
