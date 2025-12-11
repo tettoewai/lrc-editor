@@ -100,7 +100,7 @@ export function LyricsList({
               <Plus className="h-2 w-2" />
             </Button>
 
-            <div className="flex-shrink-0 w-24">
+            <div className="flex-shrink-0 w-40">
               {editingTimestampId === line.id ? (
                 <div className="flex items-center gap-1">
                   <Input
