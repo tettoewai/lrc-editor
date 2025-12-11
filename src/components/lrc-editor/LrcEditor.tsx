@@ -120,6 +120,29 @@ export function LrcEditor() {
     }
   }, [lines, pushAction]);
 
+  const handleTextChange = useCallback((lineId: string, newText: string) => {
+    setLines(prev => prev.map(l => l.id === lineId ? { ...l, text: newText } : l));
+  }, []);
+
+  const handleAddLine = useCallback((index: number, position: 'above' | 'below') => {
+    const newLine: LyricLine = {
+      id: crypto.randomUUID(),
+      text: '',
+      timestamp: null
+    };
+    setLines(prev => {
+      const newLines = [...prev];
+      const insertIndex = position === 'above' ? index : index + 1;
+      newLines.splice(insertIndex, 0, newLine);
+      return newLines;
+    });
+    if (position === 'above' && currentLineIndex >= index) {
+      setCurrentLineIndex(prev => prev + 1);
+    } else if (position === 'below' && currentLineIndex > index) {
+      setCurrentLineIndex(prev => prev + 1);
+    }
+  }, [currentLineIndex]);
+
   const handleUndo = useCallback(() => {
     const action = undo();
     if (action) {
@@ -294,6 +317,8 @@ export function LrcEditor() {
                     currentTime={currentTime}
                     onTimestampChange={handleTimestampChange}
                     onLineClick={setCurrentLineIndex}
+                    onTextChange={handleTextChange}
+                    onAddLine={handleAddLine}
                   />
                 </>
               )}
