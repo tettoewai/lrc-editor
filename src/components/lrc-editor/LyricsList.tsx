@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { X, Check, Plus } from 'lucide-react';
+import { X, Check, Plus, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -129,6 +129,20 @@ export function LyricsList({
                 </div>
               ) : (
                 <div className="flex items-center gap-1">
+                  {line.timestamp !== null && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-5 opacity-50 hover:opacity-100"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onTimestampChange(line.id, Math.max(0, line.timestamp - 0.01));
+                      }}
+                      title="-10ms"
+                    >
+                      <Minus className="h-3 w-3" />
+                    </Button>
+                  )}
                   <Badge
                     variant={line.timestamp !== null ? 'default' : 'secondary'}
                     className="text-xs font-mono cursor-pointer"
@@ -140,17 +154,32 @@ export function LyricsList({
                     {formatTimestamp(line.timestamp)}
                   </Badge>
                   {line.timestamp !== null && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-5 w-5 opacity-50 hover:opacity-100"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onTimestampChange(line.id, null);
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 opacity-50 hover:opacity-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onTimestampChange(line.id, line.timestamp + 0.01);
+                        }}
+                        title="+10ms"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 opacity-50 hover:opacity-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onTimestampChange(line.id, null);
+                        }}
+                        title="Clear timestamp"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </>
                   )}
                 </div>
               )}
