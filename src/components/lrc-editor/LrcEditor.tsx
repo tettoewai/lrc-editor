@@ -56,24 +56,21 @@ export function LrcEditor() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       
-      // Always prevent spacebar scroll
-      if (e.code === 'Space') {
+      if (e.code === 'Space' && isPlaying && lines.length > 0) {
         e.preventDefault();
-        if (isPlaying && lines.length > 0) {
-          const line = lines[currentLineIndex];
-          if (line) {
-            pushAction({
-              type: 'set',
-              lineId: line.id,
-              previousTimestamp: line.timestamp,
-              newTimestamp: currentTime
-            });
-            setLines(prev => prev.map((l, i) => 
-              i === currentLineIndex ? { ...l, timestamp: currentTime } : l
-            ));
-            if (currentLineIndex < lines.length - 1) {
-              setCurrentLineIndex(prev => prev + 1);
-            }
+        const line = lines[currentLineIndex];
+        if (line) {
+          pushAction({
+            type: 'set',
+            lineId: line.id,
+            previousTimestamp: line.timestamp,
+            newTimestamp: currentTime
+          });
+          setLines(prev => prev.map((l, i) => 
+            i === currentLineIndex ? { ...l, timestamp: currentTime } : l
+          ));
+          if (currentLineIndex < lines.length - 1) {
+            setCurrentLineIndex(prev => prev + 1);
           }
         }
       }
@@ -167,7 +164,7 @@ export function LrcEditor() {
   }, [lrcContent, metadata.title]);
 
   return (
-    <div className="h-screen bg-background p-4 md:p-6 overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-background p-4 md:p-6">
       <input
         ref={fileInputRef}
         type="file"
@@ -176,21 +173,21 @@ export function LrcEditor() {
         className="hidden"
       />
       
-      <div className="max-w-7xl mx-auto flex flex-col flex-1 min-h-0">
-        <header className="mb-4 text-center flex-shrink-0">
+      <div className="max-w-7xl mx-auto">
+        <header className="mb-6 text-center">
           <h1 className="text-2xl font-bold text-foreground">LRC Editor</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Sync lyrics with audio to create LRC files
           </p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 flex-1 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
           {/* Left Column - Import & Metadata */}
-          <Card className="flex flex-col overflow-hidden">
-            <CardHeader className="pb-3 flex-shrink-0">
+          <Card>
+            <CardHeader className="pb-3">
               <CardTitle className="text-base">Import & Metadata</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 overflow-auto flex-1">
+            <CardContent className="space-y-4">
               <AudioUploader onFileSelect={loadAudio} hasAudio={!!audioUrl} />
               <AudioPlayer
                 isPlaying={isPlaying}
@@ -219,8 +216,8 @@ export function LrcEditor() {
           </Card>
 
           {/* Center Column - Lyrics Sync Workspace */}
-          <Card className="flex flex-col overflow-hidden">
-            <CardHeader className="pb-3 flex-shrink-0">
+          <Card>
+            <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">Lyrics Sync</CardTitle>
                 <div className="flex gap-1">
@@ -255,7 +252,7 @@ export function LrcEditor() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4 overflow-auto flex-1">
+            <CardContent className="space-y-4">
               {!showLyricsList ? (
                 <LyricsInput
                   value={lyricsText}
@@ -293,11 +290,11 @@ export function LrcEditor() {
           </Card>
 
           {/* Right Column - Output & Preview */}
-          <Card className="flex flex-col overflow-hidden">
-            <CardHeader className="pb-3 flex-shrink-0">
+          <Card>
+            <CardHeader className="pb-3">
               <CardTitle className="text-base">Output & Preview</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 overflow-auto flex-1">
+            <CardContent className="space-y-4">
               <div>
                 <span className="text-sm font-medium mb-2 block">Karaoke Preview</span>
                 <KaraokePreview
