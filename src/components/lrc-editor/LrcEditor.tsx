@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { AudioUploader } from './AudioUploader';
 import { AudioPlayer } from './AudioPlayer';
 import { MetadataForm } from './MetadataForm';
@@ -215,144 +216,154 @@ export function LrcEditor() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
+        <ResizablePanelGroup direction="horizontal" className="min-h-[calc(100vh-140px)] rounded-lg border">
           {/* Left Column - Import & Metadata */}
-          <Card className="lg:col-span-1">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Import & Metadata</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <AudioUploader onFileSelect={loadAudio} hasAudio={!!audioUrl} />
-              <AudioPlayer
-                isPlaying={isPlaying}
-                currentTime={currentTime}
-                duration={duration}
-                onTogglePlay={togglePlay}
-                onSeek={seek}
-                onSeekRelative={seekRelative}
-                disabled={!audioUrl}
-              />
-              <Separator />
-              <MetadataForm metadata={metadata} onChange={setMetadata} />
-              
-              <Separator />
-              <div className="text-xs text-muted-foreground space-y-1">
-                <div className="flex items-center gap-1 font-medium">
-                  <Keyboard className="h-3 w-3" />
-                  Shortcuts
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
+            <Card className="h-full border-0 rounded-none">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Import & Metadata</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <AudioUploader onFileSelect={loadAudio} hasAudio={!!audioUrl} />
+                <AudioPlayer
+                  isPlaying={isPlaying}
+                  currentTime={currentTime}
+                  duration={duration}
+                  onTogglePlay={togglePlay}
+                  onSeek={seek}
+                  onSeekRelative={seekRelative}
+                  disabled={!audioUrl}
+                />
+                <Separator />
+                <MetadataForm metadata={metadata} onChange={setMetadata} />
+                
+                <Separator />
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <div className="flex items-center gap-1 font-medium">
+                    <Keyboard className="h-3 w-3" />
+                    Shortcuts
+                  </div>
+                  <div>Space: Stamp timestamp</div>
+                  <div>← →: Seek ±5s</div>
+                  <div>Ctrl+Z: Undo</div>
+                  <div>Ctrl+Shift+Z: Redo</div>
                 </div>
-                <div>Space: Stamp timestamp</div>
-                <div>← →: Seek ±5s</div>
-                <div>Ctrl+Z: Undo</div>
-                <div>Ctrl+Shift+Z: Redo</div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </ResizablePanel>
+
+          <ResizableHandle withHandle />
 
           {/* Center Column - Lyrics Sync Workspace */}
-          <Card className="lg:col-span-2">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Lyrics Sync</CardTitle>
-                <div className="flex gap-1">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={handleUndo}
-                        disabled={!canUndo}
-                        className="h-8 w-8"
-                      >
-                        <Undo2 className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Undo (Ctrl+Z)</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={handleRedo}
-                        disabled={!canRedo}
-                        className="h-8 w-8"
-                      >
-                        <Redo2 className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Redo (Ctrl+Shift+Z)</TooltipContent>
-                  </Tooltip>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {!showLyricsList ? (
-                <LyricsInput
-                  value={lyricsText}
-                  onChange={setLyricsText}
-                  onLoadLrc={handleLoadLrc}
-                />
-              ) : (
-                <>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Line {currentLineIndex + 1} of {lines.length}
-                    </span>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      onClick={() => {
-                        setShowLyricsList(false);
-                        clear();
-                      }}
-                      className="text-xs"
-                    >
-                      Edit text
-                    </Button>
+          <ResizablePanel defaultSize={50} minSize={30}>
+            <Card className="h-full border-0 rounded-none">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">Lyrics Sync</CardTitle>
+                  <div className="flex gap-1">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleUndo}
+                          disabled={!canUndo}
+                          className="h-8 w-8"
+                        >
+                          <Undo2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Undo (Ctrl+Z)</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleRedo}
+                          disabled={!canRedo}
+                          className="h-8 w-8"
+                        >
+                          <Redo2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Redo (Ctrl+Shift+Z)</TooltipContent>
+                    </Tooltip>
                   </div>
-                  <LyricsList
-                    lines={lines}
-                    currentLineIndex={currentLineIndex}
-                    currentTime={currentTime}
-                    onTimestampChange={handleTimestampChange}
-                    onLineClick={setCurrentLineIndex}
-                    onTextChange={handleTextChange}
-                    onAddLine={handleAddLine}
-                    onPlayFromTimestamp={(timestamp) => {
-                      seek(timestamp);
-                      if (!isPlaying) togglePlay();
-                    }}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {!showLyricsList ? (
+                  <LyricsInput
+                    value={lyricsText}
+                    onChange={setLyricsText}
+                    onLoadLrc={handleLoadLrc}
                   />
-                </>
-              )}
-            </CardContent>
-          </Card>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        Line {currentLineIndex + 1} of {lines.length}
+                      </span>
+                      <Button
+                        variant="link"
+                        size="sm"
+                        onClick={() => {
+                          setShowLyricsList(false);
+                          clear();
+                        }}
+                        className="text-xs"
+                      >
+                        Edit text
+                      </Button>
+                    </div>
+                    <LyricsList
+                      lines={lines}
+                      currentLineIndex={currentLineIndex}
+                      currentTime={currentTime}
+                      onTimestampChange={handleTimestampChange}
+                      onLineClick={setCurrentLineIndex}
+                      onTextChange={handleTextChange}
+                      onAddLine={handleAddLine}
+                      onPlayFromTimestamp={(timestamp) => {
+                        seek(timestamp);
+                        if (!isPlaying) togglePlay();
+                      }}
+                    />
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </ResizablePanel>
+
+          <ResizableHandle withHandle />
 
           {/* Right Column - Output & Preview */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Output & Preview</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <span className="text-sm font-medium mb-2 block">Karaoke Preview</span>
-                <KaraokePreview
-                  lines={lines}
-                  currentTime={currentTime}
+          <ResizablePanel defaultSize={30} minSize={20} maxSize={40}>
+            <Card className="h-full border-0 rounded-none">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Output & Preview</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <span className="text-sm font-medium mb-2 block">Karaoke Preview</span>
+                  <KaraokePreview
+                    lines={lines}
+                    currentTime={currentTime}
+                    offset={offset}
+                  />
+                </div>
+                <Separator />
+                <LrcOutput
+                  lrcContent={lrcContent}
                   offset={offset}
+                  onOffsetChange={setOffset}
+                  onDownload={handleDownload}
                 />
-              </div>
-              <Separator />
-              <LrcOutput
-                lrcContent={lrcContent}
-                offset={offset}
-                onOffsetChange={setOffset}
-                onDownload={handleDownload}
-              />
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     </div>
   );
