@@ -57,7 +57,7 @@ export function LyricsList({
   const activeIndex = getActiveLineIndex();
 
   return (
-    <ScrollArea className="h-[400px] pr-4" ref={scrollAreaRef}>
+    <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
       <div className="space-y-1">
         {lines.map((line, index) => (
           <div
