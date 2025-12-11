@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { X, Edit2, Check } from 'lucide-react';
+import { X, Check, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,8 @@ interface LyricsListProps {
   currentTime: number;
   onTimestampChange: (lineId: string, timestamp: number | null) => void;
   onLineClick: (index: number) => void;
+  onTextChange: (lineId: string, newText: string) => void;
+  onAddLine: (index: number, position: 'above' | 'below') => void;
 }
 
 export function LyricsList({
@@ -21,11 +23,15 @@ export function LyricsList({
   currentLineIndex,
   currentTime,
   onTimestampChange,
-  onLineClick
+  onLineClick,
+  onTextChange,
+  onAddLine
 }: LyricsListProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingTimestampId, setEditingTimestampId] = useState<string | null>(null);
+  const [editingTextId, setEditingTextId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [editTextValue, setEditTextValue] = useState('');
 
   useEffect(() => {
     if (currentLineIndex >= 0 && scrollAreaRef.current) {
@@ -34,15 +40,25 @@ export function LyricsList({
     }
   }, [currentLineIndex]);
 
-  const handleEditStart = (line: LyricLine) => {
-    setEditingId(line.id);
+  const handleTimestampEditStart = (line: LyricLine) => {
+    setEditingTimestampId(line.id);
     setEditValue(line.timestamp !== null ? formatTimestamp(line.timestamp).slice(1, -1) : '');
   };
 
-  const handleEditSave = (lineId: string) => {
+  const handleTimestampEditSave = (lineId: string) => {
     const parsed = parseTimestamp(`[${editValue}]`);
     onTimestampChange(lineId, parsed);
-    setEditingId(null);
+    setEditingTimestampId(null);
+  };
+
+  const handleTextEditStart = (line: LyricLine) => {
+    setEditingTextId(line.id);
+    setEditTextValue(line.text);
+  };
+
+  const handleTextEditSave = (lineId: string) => {
+    onTextChange(lineId, editTextValue);
+    setEditingTextId(null);
   };
 
   const getActiveLineIndex = () => {
@@ -65,14 +81,27 @@ export function LyricsList({
             data-line-index={index}
             onClick={() => onLineClick(index)}
             className={cn(
-              'flex items-center gap-2 p-2 rounded-md cursor-pointer transition-colors',
+              'group flex items-center gap-2 p-2 rounded-md cursor-pointer transition-colors relative',
               index === currentLineIndex && 'bg-primary/10 ring-1 ring-primary/30',
               index === activeIndex && index !== currentLineIndex && 'bg-accent/50',
               index !== currentLineIndex && index !== activeIndex && 'hover:bg-accent/30'
             )}
           >
+            {/* Add line above button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute -top-1 left-1/2 -translate-x-1/2 h-4 w-4 opacity-0 group-hover:opacity-100 z-10 bg-background border"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddLine(index, 'above');
+              }}
+            >
+              <Plus className="h-2 w-2" />
+            </Button>
+
             <div className="flex-shrink-0 w-24">
-              {editingId === line.id ? (
+              {editingTimestampId === line.id ? (
                 <div className="flex items-center gap-1">
                   <Input
                     value={editValue}
@@ -81,8 +110,8 @@ export function LyricsList({
                     className="h-6 text-xs w-20 px-1"
                     onClick={(e) => e.stopPropagation()}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleEditSave(line.id);
-                      if (e.key === 'Escape') setEditingId(null);
+                      if (e.key === 'Enter') handleTimestampEditSave(line.id);
+                      if (e.key === 'Escape') setEditingTimestampId(null);
                     }}
                     autoFocus
                   />
@@ -92,7 +121,7 @@ export function LyricsList({
                     className="h-5 w-5"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleEditSave(line.id);
+                      handleTimestampEditSave(line.id);
                     }}
                   >
                     <Check className="h-3 w-3" />
@@ -105,7 +134,7 @@ export function LyricsList({
                     className="text-xs font-mono cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleEditStart(line);
+                      handleTimestampEditStart(line);
                     }}
                   >
                     {formatTimestamp(line.timestamp)}
@@ -126,12 +155,60 @@ export function LyricsList({
                 </div>
               )}
             </div>
-            <span className={cn(
-              'text-sm flex-1',
-              !line.text.trim() && 'text-muted-foreground italic'
-            )}>
-              {line.text || '(empty line)'}
-            </span>
+
+            {/* Text editing */}
+            {editingTextId === line.id ? (
+              <div className="flex items-center gap-1 flex-1">
+                <Input
+                  value={editTextValue}
+                  onChange={(e) => setEditTextValue(e.target.value)}
+                  className="h-6 text-sm flex-1"
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleTextEditSave(line.id);
+                    if (e.key === 'Escape') setEditingTextId(null);
+                  }}
+                  autoFocus
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-5 w-5"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleTextEditSave(line.id);
+                  }}
+                >
+                  <Check className="h-3 w-3" />
+                </Button>
+              </div>
+            ) : (
+              <span
+                className={cn(
+                  'text-sm flex-1 hover:underline cursor-text',
+                  !line.text.trim() && 'text-muted-foreground italic'
+                )}
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
+                  handleTextEditStart(line);
+                }}
+              >
+                {line.text || '(empty line)'}
+              </span>
+            )}
+
+            {/* Add line below button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-4 w-4 opacity-0 group-hover:opacity-100 z-10 bg-background border"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddLine(index, 'below');
+              }}
+            >
+              <Plus className="h-2 w-2" />
+            </Button>
           </div>
         ))}
       </div>
