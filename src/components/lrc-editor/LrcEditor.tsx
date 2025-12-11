@@ -215,9 +215,9 @@ export function LrcEditor() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
           {/* Left Column - Import & Metadata */}
-          <Card>
+          <Card className="lg:col-span-1">
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Import & Metadata</CardTitle>
             </CardHeader>
@@ -250,7 +250,7 @@ export function LrcEditor() {
           </Card>
 
           {/* Center Column - Lyrics Sync Workspace */}
-          <Card>
+          <Card className="lg:col-span-2">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">Lyrics Sync</CardTitle>
