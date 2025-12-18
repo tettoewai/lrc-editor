@@ -144,6 +144,14 @@ export function LrcEditor() {
     }
   }, [currentLineIndex]);
 
+  const handleDeleteLine = useCallback((index: number) => {
+    if (lines.length <= 1) return;
+    setLines(prev => prev.filter((_, i) => i !== index));
+    if (currentLineIndex >= index && currentLineIndex > 0) {
+      setCurrentLineIndex(prev => prev - 1);
+    }
+  }, [lines.length, currentLineIndex]);
+
   const handleUndo = useCallback(() => {
     const action = undo();
     if (action) {
@@ -329,6 +337,7 @@ export function LrcEditor() {
                         seek(timestamp);
                         if (!isPlaying) togglePlay();
                       }}
+                      onDeleteLine={handleDeleteLine}
                     />
                   </>
                 )}
