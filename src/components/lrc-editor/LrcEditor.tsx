@@ -29,11 +29,22 @@ export function LrcEditor() {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [offset, setOffset] = useState(0);
   const [showLyricsList, setShowLyricsList] = useState(false);
+  const [audioFileName, setAudioFileName] = useState<string | undefined>();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const skipLyricsParseRef = useRef(false);
-  const { audioUrl, isPlaying, currentTime, duration, loadAudio, togglePlay, seek, seekRelative } = useAudioPlayer();
+  const { audioUrl, isPlaying, currentTime, duration, loadAudio, clearAudio, togglePlay, seek, seekRelative } = useAudioPlayer();
   const { canUndo, canRedo, pushAction, undo, redo, clear } = useUndoRedo();
+
+  const handleAudioFileSelect = useCallback((file: File) => {
+    setAudioFileName(file.name);
+    loadAudio(file);
+  }, [loadAudio]);
+
+  const handleAudioRemove = useCallback(() => {
+    setAudioFileName(undefined);
+    clearAudio();
+  }, [clearAudio]);
 
   // Parse lyrics text into lines (skip when loading from LRC file)
   useEffect(() => {
@@ -232,7 +243,13 @@ export function LrcEditor() {
                 <CardTitle className="text-base">Import & Metadata</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <AudioUploader onFileSelect={loadAudio} hasAudio={!!audioUrl} />
+                <AudioUploader 
+                  onFileSelect={handleAudioFileSelect} 
+                  onRemove={handleAudioRemove}
+                  hasAudio={!!audioUrl} 
+                  fileName={audioFileName}
+                  duration={duration}
+                />
                 <AudioPlayer
                   isPlaying={isPlaying}
                   currentTime={currentTime}

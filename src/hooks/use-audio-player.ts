@@ -54,12 +54,25 @@ export function useAudioPlayer() {
     }
   }, [seek]);
 
+  const clearAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
+    }
+    if (audioUrl) URL.revokeObjectURL(audioUrl);
+    setAudioUrl(null);
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+  }, [audioUrl]);
+
   return {
     audioUrl,
     isPlaying,
     currentTime,
     duration,
     loadAudio,
+    clearAudio,
     togglePlay,
     seek,
     seekRelative

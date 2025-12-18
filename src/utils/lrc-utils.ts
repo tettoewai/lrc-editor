@@ -52,6 +52,11 @@ export function parseLrc(content: string): { lines: LyricLine[]; metadata: LrcMe
       continue;
     }
 
+    // Skip offset and other metadata tags
+    if (line.match(/^\[.+:.*\]$/)) {
+      continue;
+    }
+
     const lyricMatch = line.match(/\[(\d{2}:\d{2}\.\d{2,3})\]\s*(.*)/);
     if (lyricMatch) {
       const timestamp = parseTimestamp(`[${lyricMatch[1]}]`);
@@ -60,6 +65,16 @@ export function parseLrc(content: string): { lines: LyricLine[]; metadata: LrcMe
         text: lyricMatch[2],
         timestamp
       });
+    } else {
+      // Handle unsynced text (plain text without timestamp)
+      const trimmedLine = line.trim();
+      if (trimmedLine) {
+        lines.push({
+          id: crypto.randomUUID(),
+          text: trimmedLine,
+          timestamp: null
+        });
+      }
     }
   }
 
