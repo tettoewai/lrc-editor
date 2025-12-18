@@ -27,7 +27,10 @@ export function generateLrc(lines: LyricLine[], metadata: LrcMetadata, offset: n
   const lyricLines = lines
     .filter(line => line.text.trim())
     .map(line => {
-      const adjustedTime = line.timestamp !== null ? line.timestamp + offset : null;
+      if (line.timestamp === null) {
+        return line.text;
+      }
+      const adjustedTime = line.timestamp + offset;
       return `${formatTimestamp(adjustedTime)} ${line.text}`;
     });
 
