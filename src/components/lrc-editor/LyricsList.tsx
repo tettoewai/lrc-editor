@@ -155,7 +155,7 @@ export function LyricsList({
                       handleTimestampEditStart(line);
                     }}
                   >
-                    {formatTimestamp(line.timestamp)}
+                    {line.timestamp !== null ? formatTimestamp(line.timestamp) : 'Unsynced'}
                   </Badge>
                   {line.timestamp !== null && (
                     <>

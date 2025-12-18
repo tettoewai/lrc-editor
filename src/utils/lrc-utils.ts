@@ -72,11 +72,18 @@ export function parseLrc(content: string): { lines: LyricLine[]; metadata: LrcMe
       // Handle unsynced text (plain text without timestamp)
       const trimmedLine = line.trim();
       if (trimmedLine) {
-        lines.push({
-          id: crypto.randomUUID(),
-          text: trimmedLine,
-          timestamp: null
-        });
+        let text = trimmedLine;
+        if (text.startsWith('[--:--.--]')) {
+          text = text.slice('[--:--.--]'.length).trimStart();
+        }
+
+        if (text) {
+          lines.push({
+            id: crypto.randomUUID(),
+            text,
+            timestamp: null
+          });
+        }
       }
     }
   }
