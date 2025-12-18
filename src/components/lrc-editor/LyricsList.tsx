@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { X, Check, Plus, Minus, Play } from 'lucide-react';
+import { X, Check, Plus, Minus, Play, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,7 @@ interface LyricsListProps {
   onTextChange: (lineId: string, newText: string) => void;
   onAddLine: (index: number, position: 'above' | 'below') => void;
   onPlayFromTimestamp: (timestamp: number) => void;
+  onDeleteLine: (index: number) => void;
 }
 
 export function LyricsList({
@@ -27,7 +28,8 @@ export function LyricsList({
   onLineClick,
   onTextChange,
   onAddLine,
-  onPlayFromTimestamp
+  onPlayFromTimestamp,
+  onDeleteLine
 }: LyricsListProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [editingTimestampId, setEditingTimestampId] = useState<string | null>(null);
@@ -239,6 +241,20 @@ export function LyricsList({
                 {line.text || '(empty line)'}
               </span>
             )}
+
+            {/* Delete line button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 opacity-0 group-hover:opacity-100 text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteLine(index);
+              }}
+              title="Delete line"
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
 
             {/* Add line below button */}
             <Button
